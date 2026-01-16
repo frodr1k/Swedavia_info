@@ -1,0 +1,16 @@
+{
+  "domain": "swedavia_flights",
+  "name": "Swedavia Flight Information",
+  "codeowners": [
+    "@frodr1k"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/frodr1k/Swedavia_info",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/frodr1k/Swedavia_info/issues",
+  "requirements": [
+    "aiohttp>=3.8.0"
+  ],
+  "version": "1.0.0"
+}

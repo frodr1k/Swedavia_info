@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Swedavia Flight Information",
+        "description": "Select airport and flight type.",
+        "data": {
+          "airport": "Airport",
+          "flight_type": "Flight type",
+          "hours_back": "Hours back",
+          "hours_ahead": "Hours ahead"
+        },
+        "data_description": {
+          "airport": "Select which Swedish airport to monitor",
+          "flight_type": "Choose if you want to see arrivals, departures or both",
+          "hours_back": "Number of hours back in time to show flights for (default: 2)",
+          "hours_ahead": "Number of hours ahead in time to show flights for (default: 24)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to Swedavia API",
+      "unknown": "An unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This airport and flight type is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Swedavia Flight Information Options",
+        "description": "Adjust the time window for flights.",
+        "data": {
+          "hours_back": "Hours back",
+          "hours_ahead": "Hours ahead"
+        },
+        "data_description": {
+          "hours_back": "Number of hours back in time to show flights for",
+          "hours_ahead": "Number of hours ahead in time to show flights for"
+        }
+      }
+    }
+  }
+}

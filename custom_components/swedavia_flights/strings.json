@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Swedavia Flight Information",
+        "description": "Select airport and flight type.",
+        "data": {
+          "airport": "Airport",
+          "flight_type": "Flight type",
+          "hours_back": "Hours back",
+          "hours_ahead": "Hours ahead"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to Swedavia API",
+      "unknown": "An unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This airport and flight type is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Swedavia Flight Information Options",
+        "data": {
+          "hours_back": "Hours back",
+          "hours_ahead": "Hours ahead"
+        }
+      }
+    }
+  }
+}

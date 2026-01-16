@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfigurera Swedavia Flyginformation",
+        "description": "Välj flygplats och vilken typ av flyginformation du vill ha.",
+        "data": {
+          "airport": "Flygplats",
+          "flight_type": "Typ av flyg",
+          "hours_back": "Timmar bakåt",
+          "hours_ahead": "Timmar framåt"
+        },
+        "data_description": {
+          "airport": "Välj vilken svensk flygplats du vill övervaka",
+          "flight_type": "Välj om du vill se ankomster, avgångar eller båda",
+          "hours_back": "Antal timmar bakåt i tiden att visa flyg för (standard: 2)",
+          "hours_ahead": "Antal timmar framåt i tiden att visa flyg för (standard: 24)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kunde inte ansluta till Swedavias API",
+      "unknown": "Ett oväntat fel uppstod"
+    },
+    "abort": {
+      "already_configured": "Denna flygplats och flygtyp är redan konfigurerad"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Inställningar för Swedavia Flyginformation",
+        "description": "Justera tidsfönstret för flygningar.",
+        "data": {
+          "hours_back": "Timmar bakåt",
+          "hours_ahead": "Timmar framåt"
+        },
+        "data_description": {
+          "hours_back": "Antal timmar bakåt i tiden att visa flyg för",
+          "hours_ahead": "Antal timmar framåt i tiden att visa flyg för"
+        }
+      }
+    }
+  }
+}
