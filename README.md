@@ -58,7 +58,8 @@ En Home Assistant integration för att visa flyginformation från svenska flygpl
 2. Klicka på **Lägg till integration**
 3. Sök efter "Swedavia Flight Information"
 4. Fyll i uppgifterna:
-   - **API Subscription Key**: Din nyckel från developer portalen
+   - **Primary API Key**: Din primary subscription key från developer portalen (obligatorisk)
+   - **Secondary API Key**: Din secondary key (valfri men rekommenderad)
    - **Flygplats**: Välj vilken svensk flygplats du vill övervaka
    - **Typ av flyg**: Ankomster, Avgångar eller Både
    - **Timmar bakåt**: Hur många timmar bakåt i tiden (standard: 2)
@@ -69,7 +70,34 @@ En Home Assistant integration för att visa flyginformation från svenska flygpl
 1. Logga in på https://apideveloper.swedavia.se/
 2. Gå till **Profile** → **Subscriptions**
 3. Välj din FlightInfo-subscription
-4. Kopiera **Primary key** (eller Secondary key)
+4. Kopiera **Primary key** (och helst även **Secondary key**)
+
+**💡 Tips:** Konfigurera både primary och secondary keys för automatisk failover vid key rotation!
+
+## 🔄 API Key Rotation
+
+**Viktigt:** Swedavia roterar API-nycklar var 6:e månad av säkerhetsskäl.
+
+- **Primary key** roteras i april varje år
+- **Secondary key** roteras i oktober varje år
+
+### Automatisk Failover (Rekommenderat!)
+
+Om du konfigurerar **både primary och secondary keys**:
+- ✅ Automatisk växling till secondary key om primary upphör
+- ✅ Ingen downtime vid key rotation
+- ✅ Du får tid att uppdatera keys i lugn och ro
+
+### Rotation Schema 2025-2030
+
+| Datum | Nyckel | Åtgärd |
+|-------|--------|--------|
+| 2025-04-09 | Primary | Uppdatera före detta datum |
+| 2025-10-03 | Secondary | Uppdatera före detta datum |
+| 2026-04-08 | Primary | Uppdatera före detta datum |
+| 2026-10-02 | Secondary | Uppdatera före detta datum |
+
+**📚 Se [KEY_ROTATION_GUIDE.md](KEY_ROTATION_GUIDE.md) för detaljerad information!**
 
 ## Sensorer
 

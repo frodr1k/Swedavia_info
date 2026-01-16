@@ -5,14 +5,16 @@
         "title": "Configure Swedavia Flight Information",
         "description": "Select airport and flight type.",
         "data": {
-          "api_key": "API Subscription Key",
+          "api_key": "Primary API Key",
+          "api_key_secondary": "Secondary API Key (optional)",
           "airport": "Airport",
           "flight_type": "Flight type",
           "hours_back": "Hours back",
           "hours_ahead": "Hours ahead"
         },
         "data_description": {
-          "api_key": "Subscription key from Swedavia's developer portal (https://apideveloper.swedavia.se). Register a free account and subscribe to the FlightInfo product.",
+          "api_key": "Primary subscription key from Swedavia's developer portal (https://apideveloper.swedavia.se). Required.",
+          "api_key_secondary": "Secondary subscription key (optional but recommended). During key rotation, the integration automatically switches to secondary key if primary fails.",
           "airport": "Select which Swedish airport to monitor",
           "flight_type": "Choose if you want to see arrivals, departures or both",
           "hours_back": "Number of hours back in time to show flights for (default: 2)",

@@ -5,7 +5,8 @@
         "title": "Configure Swedavia Flight Information",
         "description": "Select airport and flight type.",
         "data": {
-          "api_key": "API Subscription Key",
+          "api_key": "Primary API Key",
+          "api_key_secondary": "Secondary API Key (optional)",
           "airport": "Airport",
           "flight_type": "Flight type",
           "hours_back": "Hours back",

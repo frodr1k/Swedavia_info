@@ -30,11 +30,16 @@ class SwedaviaFlightAPI:
     """Swedavia Flight Information API Client."""
 
     def __init__(
-        self, session: aiohttp.ClientSession, api_key: str | None = None
+        self,
+        session: aiohttp.ClientSession,
+        api_key: str | None = None,
+        api_key_secondary: str | None = None,
     ) -> None:
         """Initialize the API client."""
         self._session = session
         self._api_key = api_key
+        self._api_key_secondary = api_key_secondary
+        self._current_key = api_key  # Start with primary key
         self._last_request_time = None
         self._min_request_interval = 1  # Minimum 1 second between requests
 
@@ -63,8 +68,8 @@ class SwedaviaFlightAPI:
         }
         
         # Add subscription key if provided
-        if self._api_key:
-            headers["Ocp-Apim-Subscription-Key"] = self._api_key
+        if self._current_key:
+            headers["Ocp-Apim-Subscription-Key"] = self._current_key
 
         _LOGGER.debug("Requesting %s with params %s", url, params)
 
@@ -73,6 +78,48 @@ class SwedaviaFlightAPI:
                 async with self._session.get(
                     url, headers=headers, params=params
                 ) as response:
+                    if response.status == 401:
+                        # Invalid API key - try secondary key if available
+                        if (
+                            self._api_key_secondary
+                            and self._current_key != self._api_key_secondary
+                        ):
+                            _LOGGER.warning(
+                                "Primary API key failed (401), trying secondary key"
+                            )
+                            self._current_key = self._api_key_secondary
+                            headers["Ocp-Apim-Subscription-Key"] = self._current_key
+                            
+                            # Retry with secondary key
+                            async with self._session.get(
+                                url, headers=headers, params=params
+                            ) as retry_response:
+                                if retry_response.status == 401:
+                                    raise SwedaviaAPIError(
+                                        "API authentication failed with both primary and secondary keys. "
+                                        "Please update your API keys from https://apideveloper.swedavia.se/"
+                                    )
+                                if retry_response.status != 200 and retry_response.status != 204:
+                                    text = await retry_response.text()
+                                    _LOGGER.error(
+                                        "API request failed with status %s: %s",
+                                        retry_response.status,
+                                        text,
+                                    )
+                                    raise SwedaviaAPIError(
+                                        f"API request failed with status {retry_response.status}"
+                                    )
+                                
+                                if retry_response.status == 204:
+                                    return {}
+                                
+                                return await retry_response.json()
+                        else:
+                            raise SwedaviaAPIError(
+                                "API authentication failed. Invalid subscription key. "
+                                "Please update your API key from https://apideveloper.swedavia.se/"
+                            )
+                    
                     if response.status == 429:
                         raise SwedaviaAPIRateLimitError(
                             "API rate limit exceeded"

@@ -28,14 +28,20 @@ En komplett Home Assistant integration för Swedavias flyginformation med:
 4. Klicka på **"Subscribe"**
 5. Du får direkt åtkomst (gratis!)
 
-### Steg 3: Kopiera din nyckel
+### Steg 3: Kopiera dina nycklar
 1. Gå till **"Profile"** → **"Subscriptions"**
 2. Välj din FlightInfo-subscription
 3. Kopiera **Primary key** (32 tecken lång hex-sträng)
+4. Kopiera även **Secondary key** (rekommenderat!)
 
 **Exempel på nyckel:** `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`
 
-**Spara nyckeln** - Du behöver den när du konfigurerar integrationen!
+**💡 Varför två nycklar?**
+- Primary och Secondary keys roteras var 6:e månad (alternating)
+- Med båda konfigurerade får du **automatisk failover**
+- Ingen downtime vid key rotation!
+
+**Spara båda nycklarna** - Du behöver dem när du konfigurerar integrationen!
 
 ## 📁 Projektstruktur
 
@@ -111,8 +117,11 @@ git push -u origin main
 3. **Konfigurera**:
    - Inställningar → Enheter & tjänster → Lägg till integration
    - Sök "Swedavia"
-   - Ange din **API Subscription Key**
+   - Ange din **Primary API Key** (obligatorisk)
+   - Ange din **Secondary API Key** (valfri men rekommenderad)
    - Välj flygplats och inställningar
+
+**💡 Tips:** Konfigurera både Primary och Secondary key för automatisk failover!
 
 ### Metod 2: Manuell installation
 

@@ -5,14 +5,16 @@
         "title": "Konfigurera Swedavia Flyginformation",
         "description": "Välj flygplats och vilken typ av flyginformation du vill ha.",
         "data": {
-          "api_key": "API Subscription Key",
+          "api_key": "Primary API Key",
+          "api_key_secondary": "Secondary API Key (valfritt)",
           "airport": "Flygplats",
           "flight_type": "Typ av flyg",
           "hours_back": "Timmar bakåt",
           "hours_ahead": "Timmar framåt"
         },
         "data_description": {
-          "api_key": "Subscription key från Swedavias developer portal (https://apideveloper.swedavia.se). Registrera ett gratis konto och prenumerera på FlightInfo-produkten.",
+          "api_key": "Primary subscription key från Swedavias developer portal (https://apideveloper.swedavia.se). Obligatorisk.",
+          "api_key_secondary": "Secondary subscription key (valfritt men rekommenderat). Vid key rotation växlar integrationen automatiskt till secondary key om primary failar.",
           "airport": "Välj vilken svensk flygplats du vill övervaka",
           "flight_type": "Välj om du vill se ankomster, avgångar eller båda",
           "hours_back": "Antal timmar bakåt i tiden att visa flyg för (standard: 2)",

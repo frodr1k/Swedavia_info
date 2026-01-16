@@ -15,6 +15,7 @@ import homeassistant.helpers.config_validation as cv
 from .api import SwedaviaAPIError, SwedaviaFlightAPI
 from .const import (
     CONF_API_KEY,
+    CONF_API_KEY_SECONDARY,
     CONF_AIRPORT,
     CONF_FLIGHT_TYPE,
     CONF_HOURS_AHEAD,
@@ -33,7 +34,8 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     """Validate the user input allows us to connect."""
     session = async_get_clientsession(hass)
     api_key = data.get(CONF_API_KEY)
-    api = SwedaviaFlightAPI(session, api_key)
+    api_key_secondary = data.get(CONF_API_KEY_SECONDARY)
+    api = SwedaviaFlightAPI(session, api_key, api_key_secondary)
 
     airport = data[CONF_AIRPORT]
 
@@ -76,6 +78,7 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_API_KEY): cv.string,
+                vol.Optional(CONF_API_KEY_SECONDARY): cv.string,
                 vol.Required(CONF_AIRPORT, default="ARN"): vol.In(SWEDISH_AIRPORTS),
                 vol.Required(CONF_FLIGHT_TYPE, default=FLIGHT_TYPE_BOTH): vol.In(
                     {
@@ -94,7 +97,8 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=data_schema,
             errors=errors,
             description_placeholders={
-                "api_key_desc": "Subscription key från Swedavias developer portal (https://apideveloper.swedavia.se)",
+                "api_key_desc": "Primary subscription key från Swedavias developer portal (https://apideveloper.swedavia.se)",
+                "api_key_secondary_desc": "Secondary key (valfritt men rekommenderat för automatisk failover vid key rotation)",
                 "hours_back_desc": "Antal timmar bakåt i tiden att visa flyg för",
                 "hours_ahead_desc": "Antal timmar framåt i tiden att visa flyg för",
             },
