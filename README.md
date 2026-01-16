@@ -138,6 +138,25 @@ Integrationen skapar följande sensorer:
       - Disk från/till (`check_in_from`, `check_in_to`)
     - Anmärkningar
 
+### Bagage Sensor (Ny! 🎉)
+- **State**: Antal flyg med bagageinformation
+- **Attributes**:
+  - `baggage_claims`: Lista med bagagehändelser inkl:
+    - Flightnummer och code-share
+    - Flygbolag
+    - Ursprungsflygplats
+    - Ankomsttider (scheduled, actual)
+    - Status
+    - Terminal
+    - **Bagageband** (`baggage_claim`)
+    - **Första väska** (estimerad och faktisk tid)
+    - **Sista väska** (tid)
+
+**Användningsfall**:
+- Notifieringar när första väska kommit ut
+- Övervaka vilka band som är aktiva
+- Visa när sista väskan förväntas
+
 ## Exempel på användning
 
 ### Lovelace Card - Ankomster
@@ -223,6 +242,90 @@ content: |
   {% else %}
     Inga avgående flyg just nu
   {% endif %}
+```
+
+### Lovelace Card - Bagageband 💼
+
+```yaml
+type: markdown
+content: |
+  ## 💼 Bagageband Arlanda
+  {% set baggage = state_attr('sensor.stockholm_arlanda_bagage', 'baggage_claims') %}
+  {% if baggage %}
+    Antal flyg: {{ states('sensor.stockholm_arlanda_bagage') }}
+    
+    {% for claim in baggage[:8] %}
+      **{{ claim.flight_id }}** från {{ claim.origin }}
+      
+      {% if claim.first_bag %}
+        ✅ Första väska: {{ claim.first_bag | as_timestamp | timestamp_custom('%H:%M') }}
+      {% elif claim.estimated_first_bag %}
+        🕐 Beräknad: {{ claim.estimated_first_bag | as_timestamp | timestamp_custom('%H:%M') }}
+      {% endif %}
+      
+      {% if claim.last_bag %}
+        🏁 Sista väska: {{ claim.last_bag | as_timestamp | timestamp_custom('%H:%M') }}
+      {% endif %}
+      
+      📍 Band {{ claim.baggage_claim }} | Terminal {{ claim.terminal }}
+      Status: {{ claim.status }}
+      
+      ---
+    {% endfor %}
+  {% else %}
+    Inga bagagehändelser just nu
+  {% endif %}
+```
+
+### Automation - Notifiering om bagageband
+
+```yaml
+automation:
+  - alias: "Notifiera när första väskan kommit ut"
+    trigger:
+      - platform: state
+        entity_id: sensor.stockholm_arlanda_bagage
+        attribute: baggage_claims
+    condition:
+      - condition: template
+        value_template: >
+          {% set baggage = state_attr('sensor.stockholm_arlanda_bagage', 'baggage_claims') %}
+          {{ baggage | selectattr('first_bag') | list | length > 0 }}
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Bagageband {{ state_attr('sensor.stockholm_arlanda_bagage', 'baggage_claims')[0].baggage_claim }}"
+          message: >
+            {% set claim = state_attr('sensor.stockholm_arlanda_bagage', 'baggage_claims')[0] %}
+            Första väskan från {{ claim.flight_id }} har kommit ut!
+            Från {{ claim.origin }} - Band {{ claim.baggage_claim }}
+
+  - alias: "Notifiera om specifikt flyg på bagageband"
+    trigger:
+      - platform: state
+        entity_id: sensor.stockholm_arlanda_bagage
+        attribute: baggage_claims
+    variables:
+      my_flight: "SK1234"  # Ditt flightnummer
+    condition:
+      - condition: template
+        value_template: >
+          {% set baggage = state_attr('sensor.stockholm_arlanda_bagage', 'baggage_claims') %}
+          {{ baggage | selectattr('flight_id', 'search', my_flight) | list | length > 0 }}
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Ditt flyg {{ my_flight }} har landat!"
+          message: >
+            {% set baggage = state_attr('sensor.stockholm_arlanda_bagage', 'baggage_claims') %}
+            {% set my_claim = baggage | selectattr('flight_id', 'search', my_flight) | first %}
+            Bagageband: {{ my_claim.baggage_claim }}
+            Terminal: {{ my_claim.terminal }}
+            {% if my_claim.first_bag %}
+            Första väskan ute: {{ my_claim.first_bag | as_timestamp | timestamp_custom('%H:%M') }}
+            {% elif my_claim.estimated_first_bag %}
+            Beräknad första väska: {{ my_claim.estimated_first_bag | as_timestamp | timestamp_custom('%H:%M') }}
+            {% endif %}
 ```
 
 ### Automation - Notifiering om förseningar

@@ -46,5 +46,18 @@
         }
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "arrivals": {
+        "name": "Ankomster"
+      },
+      "departures": {
+        "name": "Avgångar"
+      },
+      "baggage": {
+        "name": "Bagage"
+      }
+    }
   }
 }

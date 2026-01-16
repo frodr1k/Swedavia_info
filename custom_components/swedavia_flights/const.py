@@ -39,6 +39,7 @@ SWEDISH_AIRPORTS = {
 # Sensor Types
 SENSOR_TYPE_ARRIVALS = "arrivals"
 SENSOR_TYPE_DEPARTURES = "departures"
+SENSOR_TYPE_BAGGAGE = "baggage"
 
 # Flight Status Codes
 FLIGHT_STATUS_SCHEDULED = "SCH"

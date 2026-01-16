@@ -46,5 +46,18 @@
         }
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "arrivals": {
+        "name": "Arrivals"
+      },
+      "departures": {
+        "name": "Departures"
+      },
+      "baggage": {
+        "name": "Baggage Claim"
+      }
+    }
   }
 }

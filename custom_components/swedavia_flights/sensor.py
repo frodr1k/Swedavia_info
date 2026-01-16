@@ -43,6 +43,7 @@ from .const import (
     FLIGHT_TYPE_BOTH,
     FLIGHT_TYPE_DEPARTURES,
     SENSOR_TYPE_ARRIVALS,
+    SENSOR_TYPE_BAGGAGE,
     SENSOR_TYPE_DEPARTURES,
     SWEDISH_AIRPORTS,
 )
@@ -80,6 +81,15 @@ async def async_setup_entry(
                 coordinator,
                 entry,
                 SENSOR_TYPE_DEPARTURES,
+            )
+        )
+
+    # Add baggage claim sensor (only for arrivals)
+    if flight_type in (FLIGHT_TYPE_ARRIVALS, FLIGHT_TYPE_BOTH):
+        entities.append(
+            SwedaviaBaggageSensor(
+                coordinator,
+                entry,
             )
         )
 
@@ -231,3 +241,100 @@ class SwedaviaFlightSensor(CoordinatorEntity[SwedaviaFlightCoordinator], SensorE
             processed[ATTR_REMARKS] = ", ".join(remarks)
 
         return processed
+
+
+class SwedaviaBaggageSensor(CoordinatorEntity[SwedaviaFlightCoordinator], SensorEntity):
+    """Sensor for baggage claim information."""
+
+    _attr_has_entity_name = True
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(
+        self,
+        coordinator: SwedaviaFlightCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the baggage sensor."""
+        super().__init__(coordinator)
+        self._airport = entry.data[CONF_AIRPORT]
+        self._airport_name = SWEDISH_AIRPORTS.get(self._airport, self._airport)
+        
+        self._attr_unique_id = f"{entry.entry_id}_baggage"
+        self._attr_name = "Bagage"
+        self._attr_icon = "mdi:bag-suitcase"
+
+    @property
+    def native_value(self) -> int:
+        """Return the number of flights with baggage information."""
+        if not self.coordinator.data:
+            return 0
+
+        arrivals = self.coordinator.data.get("arrivals", [])
+        # Count flights that have baggage claim information
+        count = sum(
+            1 for flight in arrivals 
+            if flight.get("baggage", {}).get("baggageClaimUnit")
+        )
+        return count
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional attributes."""
+        if not self.coordinator.data:
+            return {}
+
+        arrivals = self.coordinator.data.get("arrivals", [])
+        baggage_events = []
+
+        for flight in arrivals:
+            baggage = flight.get("baggage", {})
+            baggage_claim = baggage.get("baggageClaimUnit")
+            
+            # Only include flights with baggage claim information
+            if not baggage_claim:
+                continue
+
+            airline = flight.get("airlineOperator", {})
+            time_data = flight.get("arrivalTime", {})
+            location = flight.get("locationAndStatus", {})
+
+            # Get the most accurate arrival time
+            arrival_time = (
+                time_data.get("actualUtc")
+                or time_data.get("estimatedUtc")
+                or time_data.get("scheduledUtc", "")
+            )
+
+            event = {
+                ATTR_FLIGHT_ID: flight.get("flightId", ""),
+                ATTR_AIRLINE: airline.get("name", ""),
+                ATTR_ORIGIN: flight.get("departureAirportSwedish", ""),
+                ATTR_SCHEDULED_TIME: time_data.get("scheduledUtc", ""),
+                ATTR_ACTUAL_TIME: time_data.get("actualUtc", ""),
+                ATTR_STATUS: location.get("flightLegStatusSwedish", ""),
+                ATTR_TERMINAL: location.get("terminal", ""),
+                ATTR_BAGGAGE_CLAIM: baggage_claim,
+                ATTR_ESTIMATED_FIRST_BAG: baggage.get("estimatedFirstBagUtc", ""),
+                ATTR_FIRST_BAG: baggage.get("firstBagUtc", ""),
+                ATTR_LAST_BAG: baggage.get("lastBagUtc", ""),
+            }
+
+            # Add code share flights
+            code_share = flight.get("codeShareData", [])
+            if code_share:
+                event[ATTR_CODE_SHARE] = code_share
+
+            baggage_events.append(event)
+
+        # Sort by actual/estimated/scheduled time
+        baggage_events.sort(
+            key=lambda x: x.get(ATTR_ACTUAL_TIME) 
+            or x.get(ATTR_SCHEDULED_TIME) 
+            or ""
+        )
+
+        return {
+            "airport": self._airport_name,
+            "airport_iata": self._airport,
+            "baggage_claims": baggage_events,
+        }
