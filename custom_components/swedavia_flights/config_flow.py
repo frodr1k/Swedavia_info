@@ -75,11 +75,17 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=info["title"], data=user_input)
 
         # Build schema with airport selector
+        # Create airport selection with "Name (IATA)" format
+        airport_options = {
+            code: f"{name} ({code})" 
+            for code, name in SWEDISH_AIRPORTS.items()
+        }
+        
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_API_KEY): cv.string,
                 vol.Optional(CONF_API_KEY_SECONDARY): cv.string,
-                vol.Required(CONF_AIRPORT, default="ARN"): vol.In(SWEDISH_AIRPORTS),
+                vol.Required(CONF_AIRPORT, default="ARN"): vol.In(airport_options),
                 vol.Required(CONF_FLIGHT_TYPE, default=FLIGHT_TYPE_BOTH): vol.In(
                     {
                         FLIGHT_TYPE_ARRIVALS: "Ankomster",
