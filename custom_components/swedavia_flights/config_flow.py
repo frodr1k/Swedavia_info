@@ -124,7 +124,7 @@ class SwedaviaFlightOptionsFlow(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
+        self._config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -133,8 +133,8 @@ class SwedaviaFlightOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             # Update config entry data
             self.hass.config_entries.async_update_entry(
-                self.config_entry,
-                data={**self.config_entry.data, **user_input},
+                self._config_entry,
+                data={**self._config_entry.data, **user_input},
             )
             return self.async_create_entry(title="", data={})
 
@@ -142,11 +142,11 @@ class SwedaviaFlightOptionsFlow(config_entries.OptionsFlow):
             {
                 vol.Optional(
                     CONF_HOURS_BACK,
-                    default=self.config_entry.data.get(CONF_HOURS_BACK, 2),
+                    default=self._config_entry.data.get(CONF_HOURS_BACK, 2),
                 ): cv.positive_int,
                 vol.Optional(
                     CONF_HOURS_AHEAD,
-                    default=self.config_entry.data.get(CONF_HOURS_AHEAD, 24),
+                    default=self._config_entry.data.get(CONF_HOURS_AHEAD, 24),
                 ): cv.positive_int,
             }
         )

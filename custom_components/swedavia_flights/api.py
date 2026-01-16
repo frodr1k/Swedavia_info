@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 from typing import Any
 
@@ -156,7 +156,7 @@ class SwedaviaFlightAPI:
     ) -> dict[str, Any]:
         """Get arrivals for an airport."""
         if date is None:
-            date = datetime.now().strftime("%Y-%m-%d")
+            date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
         endpoint = f"{airport_iata}/arrivals/{date}"
         return await self._request(endpoint)
@@ -166,7 +166,7 @@ class SwedaviaFlightAPI:
     ) -> dict[str, Any]:
         """Get departures for an airport."""
         if date is None:
-            date = datetime.now().strftime("%Y-%m-%d")
+            date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
         endpoint = f"{airport_iata}/departures/{date}"
         return await self._request(endpoint)
@@ -180,7 +180,8 @@ class SwedaviaFlightAPI:
     ) -> list[dict[str, Any]]:
         """Get flights within a date range."""
         flights = []
-        today = datetime.now().date()
+        now = datetime.now(timezone.utc)
+        today = now.date()
         
         # Calculate date range
         start_date = today - timedelta(hours=hours_back) if hours_back > 0 else today
@@ -212,7 +213,7 @@ class SwedaviaFlightAPI:
             current_date += timedelta(days=1)
         
         # Filter by time window
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         filtered_flights = []
         
         for flight in flights:
