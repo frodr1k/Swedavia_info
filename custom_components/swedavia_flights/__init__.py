@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import SwedaviaFlightAPI
-from .const import DOMAIN
+from .const import CONF_API_KEY, DOMAIN
 from .coordinator import SwedaviaFlightCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,7 +23,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Create API client
     session = async_get_clientsession(hass)
-    api = SwedaviaFlightAPI(session)
+    api_key = entry.data.get(CONF_API_KEY)
+    api = SwedaviaFlightAPI(session, api_key)
 
     # Create coordinator
     coordinator = SwedaviaFlightCoordinator(hass, api, entry)

@@ -2,6 +2,16 @@
 
 Visa flyginformation från svenska Swedavia-flygplatser direkt i Home Assistant!
 
+## ⚠️ Viktigt - API-nyckel krävs!
+
+**Innan installation:** Du måste skaffa en **gratis API-nyckel** från Swedavia:
+
+1. Registrera på https://apideveloper.swedavia.se/
+2. Prenumerera på **FlightInfo** (gratis)
+3. Kopiera din **Primary key** från Profile → Subscriptions
+
+Nyckeln behövs vid konfiguration av integrationen.
+
 ## Funktioner
 
 - 🛬 **Ankomster** - Fullständig information om ankommande flyg inklusive bagage-information

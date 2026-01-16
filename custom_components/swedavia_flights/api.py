@@ -29,9 +29,12 @@ class SwedaviaAPIRateLimitError(SwedaviaAPIError):
 class SwedaviaFlightAPI:
     """Swedavia Flight Information API Client."""
 
-    def __init__(self, session: aiohttp.ClientSession) -> None:
+    def __init__(
+        self, session: aiohttp.ClientSession, api_key: str | None = None
+    ) -> None:
         """Initialize the API client."""
         self._session = session
+        self._api_key = api_key
         self._last_request_time = None
         self._min_request_interval = 1  # Minimum 1 second between requests
 
@@ -58,6 +61,10 @@ class SwedaviaFlightAPI:
             "Accept": "application/json",
             "User-Agent": "HomeAssistant-SwedaviaFlights/1.0",
         }
+        
+        # Add subscription key if provided
+        if self._api_key:
+            headers["Ocp-Apim-Subscription-Key"] = self._api_key
 
         _LOGGER.debug("Requesting %s with params %s", url, params)
 

@@ -4,11 +4,38 @@
 
 En komplett Home Assistant integration för Swedavias flyginformation med:
 
+- **API-nyckel autentisering** via Swedavias developer portal
 - **12 svenska flygplatser** (ARN, GOT, MMX, BMA, LLA, UME, VBY, KRN, RNB, VST, ORB, NYO)
 - **Ankomster** med bagageinformation (band, första/sista väska)
 - **Avgångar** med gate-info (öppning/stängning) och incheckning
 - **Code-share flyg** - Alla flightnummer för samma flygning
 - **Realtidsdata** - Uppdateras var 5:e minut från Swedavias API
+
+## 🔑 Skaffa API-nyckel (Obligatoriskt!)
+
+**Innan du installerar integrationen måste du ha en API-nyckel från Swedavia:**
+
+### Steg 1: Registrera konto
+1. Gå till https://apideveloper.swedavia.se/
+2. Klicka på **"Sign up"**
+3. Fyll i e-post och lösenord
+4. Bekräfta din e-post (kolla spam!)
+
+### Steg 2: Prenumerera på FlightInfo
+1. Logga in på portalen
+2. Gå till **"Products"**
+3. Välj **"FlightInfo"**
+4. Klicka på **"Subscribe"**
+5. Du får direkt åtkomst (gratis!)
+
+### Steg 3: Kopiera din nyckel
+1. Gå till **"Profile"** → **"Subscriptions"**
+2. Välj din FlightInfo-subscription
+3. Kopiera **Primary key** (32 tecken lång hex-sträng)
+
+**Exempel på nyckel:** `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6`
+
+**Spara nyckeln** - Du behöver den när du konfigurerar integrationen!
 
 ## 📁 Projektstruktur
 
@@ -84,6 +111,7 @@ git push -u origin main
 3. **Konfigurera**:
    - Inställningar → Enheter & tjänster → Lägg till integration
    - Sök "Swedavia"
+   - Ange din **API Subscription Key**
    - Välj flygplats och inställningar
 
 ### Metod 2: Manuell installation
@@ -96,7 +124,7 @@ git push -u origin main
 
 2. **Starta om** Home Assistant
 
-3. **Konfigurera** som ovan
+3. **Konfigurera** som ovan (glöm inte API-nyckeln!)
 
 ## 🎯 Användning
 
@@ -156,6 +184,7 @@ automation:
 ### Konfigureringsalternativ
 
 **Vid installation:**
+- **API Subscription Key**: Din nyckel från developer portalen (obligatorisk!)
 - **Flygplats**: Välj från 12 svenska flygplatser
 - **Flygtyp**: Ankomster, Avgångar eller Både
 - **Timmar bakåt**: Hur långt tillbaka i tiden (standard: 2h)
@@ -195,10 +224,17 @@ automation:
 - Starta om Home Assistant
 - Kolla loggen för fel: Inställningar → System → Loggar
 
-### API-fel
+### API-fel / Autentiseringsfel
+- **Kontrollera API-nyckeln** - Den måste vara korrekt kopierad från developer portalen
+- **Verifiera subscription** - Logga in på https://apideveloper.swedavia.se/ och kontrollera att du har en aktiv FlightInfo-subscription
 - Kontrollera internetanslutning
 - Swedavias API kan vara tillfälligt nere
 - Integrationen har automatisk retry och felhantering
+
+### "Cannot connect" eller "Invalid API key"
+- **Fel nyckel**: Kopiera nyckeln igen från Profile → Subscriptions → Primary key
+- **Ingen subscription**: Prenumerera på FlightInfo-produkten i developer portalen
+- **Utgången nyckel**: Regenerera nyckeln i portalen om den är gammal
 
 ### Inga flyg visas
 - Kontrollera tidsfönstret (timmar bakåt/framåt)

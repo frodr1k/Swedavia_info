@@ -20,6 +20,21 @@ En Home Assistant integration för att visa flyginformation från svenska flygpl
 
 ## Installation
 
+### Förberedelser - Skaffa API-nyckel
+
+**Swedavias API kräver en gratis API-nyckel (Subscription Key):**
+
+1. Gå till Swedavias developer portal: https://apideveloper.swedavia.se/
+2. Klicka på **"Sign up"** och skapa ett gratis konto
+3. Bekräfta din e-postadress (kolla spam-mappen)
+4. Logga in på portalen
+5. Gå till **"Products"** → **"FlightInfo"**
+6. Klicka på **"Subscribe"** (gratis, direkt åtkomst)
+7. Gå till **"Profile"** → **"Subscriptions"**
+8. Kopiera din **Primary key** eller **Secondary key**
+
+**Nyckeln ser ut ungefär så här:** `abc123def456ghi789jkl012mno345pq`
+
 ### HACS (Rekommenderat)
 
 1. Lägg till detta repository som en custom repository i HACS:
@@ -42,11 +57,19 @@ En Home Assistant integration för att visa flyginformation från svenska flygpl
 1. Gå till **Inställningar** → **Enheter & tjänster**
 2. Klicka på **Lägg till integration**
 3. Sök efter "Swedavia Flight Information"
-4. Välj flygplats och inställningar:
+4. Fyll i uppgifterna:
+   - **API Subscription Key**: Din nyckel från developer portalen
    - **Flygplats**: Välj vilken svensk flygplats du vill övervaka
    - **Typ av flyg**: Ankomster, Avgångar eller Både
    - **Timmar bakåt**: Hur många timmar bakåt i tiden (standard: 2)
    - **Timmar framåt**: Hur många timmar framåt i tiden (standard: 24)
+
+### Var hittar jag min API-nyckel?
+
+1. Logga in på https://apideveloper.swedavia.se/
+2. Gå till **Profile** → **Subscriptions**
+3. Välj din FlightInfo-subscription
+4. Kopiera **Primary key** (eller Secondary key)
 
 ## Sensorer
 
@@ -201,8 +224,17 @@ automation:
 
 Denna integration använder Swedavias officiella Flight Information API v2:
 - **Endpoint**: `https://api.swedavia.se/flightinfo/v2`
+- **Developer Portal**: https://apideveloper.swedavia.se/
+- **Autentisering**: Subscription Key (Ocp-Apim-Subscription-Key header)
+- **Kostnad**: Gratis för FlightInfo-produkten
 - **Uppdateringsfrekvens**: Var 5:e minut
 - **Rate limiting**: Implementerad med 1 sekunds minimum mellan requests
+
+### Skaffa API-nyckel
+
+1. **Registrera konto**: https://apideveloper.swedavia.se/
+2. **Prenumerera på FlightInfo**: Produkter → FlightInfo → Subscribe (gratis)
+3. **Hämta nyckel**: Profile → Subscriptions → Primary key
 
 ## Support
 

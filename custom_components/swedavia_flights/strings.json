@@ -5,6 +5,7 @@
         "title": "Configure Swedavia Flight Information",
         "description": "Select airport and flight type.",
         "data": {
+          "api_key": "API Subscription Key",
           "airport": "Airport",
           "flight_type": "Flight type",
           "hours_back": "Hours back",
@@ -14,6 +15,7 @@
     },
     "error": {
       "cannot_connect": "Cannot connect to Swedavia API",
+      "invalid_auth": "Invalid API key",
       "unknown": "An unexpected error occurred"
     },
     "abort": {

@@ -12,6 +12,7 @@ CONF_AIRPORT = "airport"
 CONF_FLIGHT_TYPE = "flight_type"
 CONF_HOURS_AHEAD = "hours_ahead"
 CONF_HOURS_BACK = "hours_back"
+CONF_API_KEY = "api_key"
 
 # Flight Types
 FLIGHT_TYPE_ARRIVALS = "arrivals"

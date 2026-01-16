@@ -5,12 +5,14 @@
         "title": "Configure Swedavia Flight Information",
         "description": "Select airport and flight type.",
         "data": {
+          "api_key": "API Subscription Key",
           "airport": "Airport",
           "flight_type": "Flight type",
           "hours_back": "Hours back",
           "hours_ahead": "Hours ahead"
         },
         "data_description": {
+          "api_key": "Subscription key from Swedavia's developer portal (https://apideveloper.swedavia.se). Register a free account and subscribe to the FlightInfo product.",
           "airport": "Select which Swedish airport to monitor",
           "flight_type": "Choose if you want to see arrivals, departures or both",
           "hours_back": "Number of hours back in time to show flights for (default: 2)",
@@ -19,7 +21,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Cannot connect to Swedavia API",
+      "cannot_connect": "Cannot connect to Swedavia API. Check your API key and internet connection.",
+      "invalid_auth": "Invalid API key. Check your subscription key from the developer portal.",
       "unknown": "An unexpected error occurred"
     },
     "abort": {
