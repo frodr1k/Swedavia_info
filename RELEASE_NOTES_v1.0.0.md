@@ -12,6 +12,9 @@ First release of Swedavia Flight Information integration for Home Assistant!
 - ✅ GUI configuration via config flow
 - ✅ Automatic updates every 5 minutes
 - ✅ Proper error handling and API rate limiting
+- ✅ **Dual API key support** (primary + secondary)
+- ✅ **Automatic failover** between keys on HTTP 401 errors
+- ✅ **Key rotation support** with zero downtime
 
 #### Flight Information
 - ✅ **Arrivals sensor** with comprehensive data:
@@ -59,6 +62,8 @@ First release of Swedavia Flight Information integration for Home Assistant!
 - ✅ Swedish and English translations
 - ✅ HACS compatible
 - ✅ GitHub Actions validation (Hassfest + HACS)
+- ✅ **Automatic API key failover** (primary → secondary on errors)
+- ✅ **Key rotation ready** with dual key configuration
 
 ### Supported Airports
 
@@ -78,6 +83,13 @@ First release of Swedavia Flight Information integration for Home Assistant!
 | NYO | Stockholm Skavsta |
 
 ### Installation
+
+#### Prerequisites
+1. Register at https://apideveloper.swedavia.se/
+2. Subscribe to FlightInfo API (free)
+3. Copy your **Primary key** and **Secondary key**
+
+**💡 Tip**: Using both keys provides automatic failover during key rotation!
 
 #### Via HACS (Recommended)
 1. Add custom repository: `https://github.com/frodr1k/Swedavia_info`
@@ -108,7 +120,22 @@ See the [README.md](README.md) for detailed usage examples including:
 - **Base URL**: https://api.swedavia.se/flightinfo/v2
 - **Update Interval**: 5 minutes
 - **Rate Limiting**: 1 second minimum between requests
-- **Authentication**: None required (public API)
+- **Authentication**: API subscription keys (Ocp-Apim-Subscription-Key header)
+- **Key Rotation**: Every 6 months (alternating primary/secondary keys)
+
+### 🔄 API Key Rotation
+
+**Important**: Swedavia rotates API keys every 6 months for security:
+- **Primary key**: Rotated in April each year
+- **Secondary key**: Rotated in October each year
+
+**Automatic Failover**: Configure both primary and secondary keys for:
+- ✅ Zero downtime during key rotation
+- ✅ Automatic switching to secondary key if primary fails
+- ✅ Warning logs when failover occurs
+- ✅ Time to update expired keys at your convenience
+
+**Rotation Schedule 2025-2030**: See [KEY_ROTATION_GUIDE.md](KEY_ROTATION_GUIDE.md) for complete schedule and best practices.
 
 ### Requirements
 
