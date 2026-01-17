@@ -1,0 +1,20 @@
+# Services for Swedavia Flight Information
+
+update_api_keys:
+  name: Update API Keys
+  description: Update primary and/or secondary API keys for all Swedavia Flight Information integrations. Use this when your keys have been rotated.
+  fields:
+    api_key:
+      name: Primary API Key
+      description: New primary subscription key from Swedavia developer portal
+      example: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+      required: false
+      selector:
+        text:
+    api_key_secondary:
+      name: Secondary API Key
+      description: New secondary subscription key from Swedavia developer portal
+      example: "p6o5n4m3l2k1j0i9h8g7f6e5d4c3b2a1"
+      required: false
+      selector:
+        text:

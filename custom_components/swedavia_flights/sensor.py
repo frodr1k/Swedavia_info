@@ -45,9 +45,11 @@ from .const import (
     SENSOR_TYPE_ARRIVALS,
     SENSOR_TYPE_BAGGAGE,
     SENSOR_TYPE_DEPARTURES,
+    SENSOR_TYPE_KEY_ROTATION,
     SWEDISH_AIRPORTS,
 )
 from .coordinator import SwedaviaFlightCoordinator
+from .key_rotation import get_all_rotation_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -92,6 +94,13 @@ async def async_setup_entry(
                 entry,
             )
         )
+
+    # Add key rotation sensor (one per integration instance)
+    entities.append(
+        SwedaviaKeyRotationSensor(
+            entry,
+        )
+    )
 
     async_add_entities(entities)
 
@@ -338,3 +347,100 @@ class SwedaviaBaggageSensor(CoordinatorEntity[SwedaviaFlightCoordinator], Sensor
             "airport_iata": self._airport,
             "baggage_claims": baggage_events,
         }
+
+
+class SwedaviaKeyRotationSensor(SensorEntity):
+    """Sensor for API key rotation status."""
+
+    _attr_has_entity_name = True
+    _attr_icon = "mdi:key-chain"
+
+    def __init__(
+        self,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the key rotation sensor."""
+        self._airport = entry.data[CONF_AIRPORT]
+        self._attr_unique_id = f"{entry.entry_id}_key_rotation"
+        self._attr_name = "API-nyckel rotation"
+        self._attr_device_class = None
+
+    @property
+    def native_value(self) -> str:
+        """Return the status of key rotation."""
+        rotation_info = get_all_rotation_info()
+        
+        # Check if any warning is active
+        primary_warning = rotation_info["primary_key"]["warning_active"]
+        secondary_warning = rotation_info["secondary_key"]["warning_active"]
+        
+        if primary_warning:
+            primary_days = rotation_info["primary_key"]["days_until_rotation"]
+            if primary_days == 0:
+                return "Primär nyckel roteras IDAG!"
+            elif primary_days == 1:
+                return "Primär nyckel roteras imorgon"
+            else:
+                return f"Primär nyckel roteras om {primary_days} dagar"
+        elif secondary_warning:
+            secondary_days = rotation_info["secondary_key"]["days_until_rotation"]
+            if secondary_days == 0:
+                return "Sekundär nyckel roteras IDAG!"
+            elif secondary_days == 1:
+                return "Sekundär nyckel roteras imorgon"
+            else:
+                return f"Sekundär nyckel roteras om {secondary_days} dagar"
+        else:
+            # No immediate warnings
+            primary_days = rotation_info["primary_key"]["days_until_rotation"]
+            secondary_days = rotation_info["secondary_key"]["days_until_rotation"]
+            
+            if primary_days is not None and (secondary_days is None or primary_days < secondary_days):
+                return f"OK - Nästa rotation om {primary_days} dagar (primär)"
+            elif secondary_days is not None:
+                return f"OK - Nästa rotation om {secondary_days} dagar (sekundär)"
+            else:
+                return "OK - Ingen rotation schemalagd"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional attributes."""
+        rotation_info = get_all_rotation_info()
+        
+        return {
+            "primary_key_next_rotation": rotation_info["primary_key"]["next_rotation"],
+            "primary_key_days_until": rotation_info["primary_key"]["days_until_rotation"],
+            "primary_key_warning": rotation_info["primary_key"]["warning_message"],
+            "secondary_key_next_rotation": rotation_info["secondary_key"]["next_rotation"],
+            "secondary_key_days_until": rotation_info["secondary_key"]["days_until_rotation"],
+            "secondary_key_warning": rotation_info["secondary_key"]["warning_message"],
+            "update_service": f"{DOMAIN}.update_api_keys",
+            "developer_portal": "https://apideveloper.swedavia.se/",
+        }
+
+    @property
+    def icon(self) -> str:
+        """Return icon based on status."""
+        rotation_info = get_all_rotation_info()
+        
+        # Check days until rotation
+        primary_days = rotation_info["primary_key"]["days_until_rotation"]
+        secondary_days = rotation_info["secondary_key"]["days_until_rotation"]
+        
+        min_days = None
+        if primary_days is not None and secondary_days is not None:
+            min_days = min(primary_days, secondary_days)
+        elif primary_days is not None:
+            min_days = primary_days
+        elif secondary_days is not None:
+            min_days = secondary_days
+        
+        if min_days is not None:
+            if min_days == 0:
+                return "mdi:key-alert"
+            elif min_days <= 3:
+                return "mdi:key-remove"
+            else:
+                return "mdi:key-chain"
+        
+        return "mdi:key-chain"

@@ -57,6 +57,25 @@
       },
       "baggage": {
         "name": "Bagage"
+      },
+      "key_rotation": {
+        "name": "API-nyckel rotation"
+      }
+    }
+  },
+  "services": {
+    "update_api_keys": {
+      "name": "Uppdatera API-nycklar",
+      "description": "Uppdatera primär och/eller sekundär API-nyckel för alla Swedavia Flight Information integrationer. Använd detta när dina nycklar har roterats.",
+      "fields": {
+        "api_key": {
+          "name": "Primär API-nyckel",
+          "description": "Ny primär subscription key från Swedavias developer portal"
+        },
+        "api_key_secondary": {
+          "name": "Sekundär API-nyckel",
+          "description": "Ny sekundär subscription key från Swedavias developer portal"
+        }
       }
     }
   }

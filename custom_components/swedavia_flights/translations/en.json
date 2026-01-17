@@ -57,6 +57,25 @@
       },
       "baggage": {
         "name": "Baggage Claim"
+      },
+      "key_rotation": {
+        "name": "API Key Rotation"
+      }
+    }
+  },
+  "services": {
+    "update_api_keys": {
+      "name": "Update API Keys",
+      "description": "Update primary and/or secondary API keys for all Swedavia Flight Information integrations. Use this when your keys have been rotated.",
+      "fields": {
+        "api_key": {
+          "name": "Primary API Key",
+          "description": "New primary subscription key from Swedavia developer portal"
+        },
+        "api_key_secondary": {
+          "name": "Secondary API Key",
+          "description": "New secondary subscription key from Swedavia developer portal"
+        }
       }
     }
   }
