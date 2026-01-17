@@ -103,24 +103,24 @@ def get_rotation_warning_message(key_type: str = "primary") -> str:
     if days is None or next_rotation is None:
         return ""
     
-    key_name = "primär" if key_type == "primary" else "sekundär"
+    key_name = "primary" if key_type == "primary" else "secondary"
     
     if days == 0:
         return (
-            f"⚠️ VIKTIGT: Din {key_name} API-nyckel roteras IDAG! "
-            f"Uppdatera din nyckel från https://apideveloper.swedavia.se/ "
-            f"för att undvika avbrott i tjänsten."
+            f"⚠️ IMPORTANT: Your {key_name} API key rotates TODAY! "
+            f"Update your key from https://apideveloper.swedavia.se/ "
+            f"to avoid service interruption."
         )
     elif days == 1:
         return (
-            f"⚠️ VARNING: Din {key_name} API-nyckel roteras IMORGON ({next_rotation.strftime('%Y-%m-%d')})! "
-            f"Uppdatera din nyckel från https://apideveloper.swedavia.se/"
+            f"⚠️ WARNING: Your {key_name} API key rotates TOMORROW ({next_rotation.strftime('%Y-%m-%d')})! "
+            f"Update your key from https://apideveloper.swedavia.se/"
         )
     else:
         return (
-            f"ℹ️ Påminnelse: Din {key_name} API-nyckel kommer att roteras om {days} dagar "
+            f"ℹ️ Reminder: Your {key_name} API key will rotate in {days} days "
             f"({next_rotation.strftime('%Y-%m-%d')}). "
-            f"Förbered genom att hämta ny nyckel från https://apideveloper.swedavia.se/"
+            f"Prepare by getting new key from https://apideveloper.swedavia.se/"
         )
 
 

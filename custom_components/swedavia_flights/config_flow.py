@@ -107,8 +107,8 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=data_schema,
             errors=errors,
             description_placeholders={
-                "api_key_desc": "Primär subscription key från Swedavias developer portal (https://apideveloper.swedavia.se). Obligatorisk.",
-                "api_key_secondary_desc": "Sekundär subscription key (valfritt men rekommenderat). Vid nyckelrotation växlar integrationen automatiskt till sekundär nyckel om primär misslyckas.",
+                "api_key_desc": "Primary subscription key from Swedavia developer portal (https://apideveloper.swedavia.se). Required.",
+                "api_key_secondary_desc": "Secondary subscription key (optional but recommended). During key rotation, integration automatically switches to secondary key if primary fails.",
             },
         )
 

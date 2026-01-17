@@ -362,7 +362,7 @@ class SwedaviaKeyRotationSensor(SensorEntity):
         """Initialize the key rotation sensor."""
         self._airport = entry.data[CONF_AIRPORT]
         self._attr_unique_id = f"{entry.entry_id}_key_rotation"
-        self._attr_name = "API-nyckel rotation"
+        self._attr_name = "API Key Rotation"
         self._attr_device_class = None
 
     @property
@@ -377,30 +377,30 @@ class SwedaviaKeyRotationSensor(SensorEntity):
         if primary_warning:
             primary_days = rotation_info["primary_key"]["days_until_rotation"]
             if primary_days == 0:
-                return "Primär nyckel roteras IDAG!"
+                return "Primary key rotates TODAY!"
             elif primary_days == 1:
-                return "Primär nyckel roteras imorgon"
+                return "Primary key rotates tomorrow"
             else:
-                return f"Primär nyckel roteras om {primary_days} dagar"
+                return f"Primary key rotates in {primary_days} days"
         elif secondary_warning:
             secondary_days = rotation_info["secondary_key"]["days_until_rotation"]
             if secondary_days == 0:
-                return "Sekundär nyckel roteras IDAG!"
+                return "Secondary key rotates TODAY!"
             elif secondary_days == 1:
-                return "Sekundär nyckel roteras imorgon"
+                return "Secondary key rotates tomorrow"
             else:
-                return f"Sekundär nyckel roteras om {secondary_days} dagar"
+                return f"Secondary key rotates in {secondary_days} days"
         else:
             # No immediate warnings
             primary_days = rotation_info["primary_key"]["days_until_rotation"]
             secondary_days = rotation_info["secondary_key"]["days_until_rotation"]
             
             if primary_days is not None and (secondary_days is None or primary_days < secondary_days):
-                return f"OK - Nästa rotation om {primary_days} dagar (primär)"
+                return f"OK - Next rotation in {primary_days} days (primary)"
             elif secondary_days is not None:
-                return f"OK - Nästa rotation om {secondary_days} dagar (sekundär)"
+                return f"OK - Next rotation in {secondary_days} days (secondary)"
             else:
-                return "OK - Ingen rotation schemalagd"
+                return "OK - No rotation scheduled"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
