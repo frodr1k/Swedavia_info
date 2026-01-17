@@ -97,7 +97,9 @@ Om du konfigurerar **både primary och secondary keys**:
 | 2026-04-08 | Primary | Uppdatera före detta datum |
 | 2026-10-02 | Secondary | Uppdatera före detta datum |
 
-**📚 Se [KEY_ROTATION_GUIDE.md](KEY_ROTATION_GUIDE.md) för detaljerad information!**
+**📚 Detaljerad information:**
+- [KEY_ROTATION_MANAGEMENT.md](KEY_ROTATION_MANAGEMENT.md) - Fullständig guide
+- [KEY_ROTATION_QUICK_ACCESS.md](KEY_ROTATION_QUICK_ACCESS.md) - ⚡ Färdiga dashboard-knappar och scripts!
 
 ## Sensorer
 

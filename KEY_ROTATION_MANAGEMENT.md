@@ -1,5 +1,7 @@
 # API Key Rotation Management
 
+> **⚡ Quick Access:** Looking for easy ways to update keys? See [KEY_ROTATION_QUICK_ACCESS.md](KEY_ROTATION_QUICK_ACCESS.md) for ready-to-use dashboard buttons, scripts, and automation examples!
+
 ## Overview
 
 Swedavia rotates API keys every 6 months for security. This integration includes automated warning systems and tools to manage key rotation seamlessly.
