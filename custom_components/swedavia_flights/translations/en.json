@@ -1,6 +1,34 @@
 {
   "config": {
     "step": {
+      "api_keys": {
+        "title": "Swedavia API Keys",
+        "description": "Enter your API keys from Swedavia's developer portal.",
+        "data": {
+          "api_key": "Primary API Key",
+          "api_key_secondary": "Secondary API Key (optional)"
+        },
+        "data_description": {
+          "api_key": "Primary subscription key from Swedavia's developer portal (https://apideveloper.swedavia.se). Required.",
+          "api_key_secondary": "Secondary subscription key (optional but recommended). During key rotation, the integration automatically switches to secondary key if primary fails."
+        }
+      },
+      "airport": {
+        "title": "Configure Airport",
+        "description": "Select airport and flight information type.",
+        "data": {
+          "airport": "Airport",
+          "flight_type": "Flight type",
+          "hours_back": "Hours back",
+          "hours_ahead": "Hours ahead"
+        },
+        "data_description": {
+          "airport": "Select which Swedish airport to monitor",
+          "flight_type": "Choose if you want to see arrivals, departures or both",
+          "hours_back": "Number of hours back in time to show flights for (default: 2)",
+          "hours_ahead": "Number of hours ahead in time to show flights for (default: 24)"
+        }
+      },
       "user": {
         "title": "Configure Swedavia Flight Information",
         "description": "Select airport and flight type.",

@@ -59,3 +59,8 @@ secrets.yaml
 *.db
 *.db-shm
 *.db-wal
+
+# Documentation source files (info already in docs)
+*.pdf
+*.docx
+*.xlsx
