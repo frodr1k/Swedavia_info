@@ -51,15 +51,86 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    def __init__(self) -> None:
+        """Initialize the config flow."""
+        self._existing_api_keys: dict[str, str] | None = None
+
+    def _get_existing_api_keys(self) -> dict[str, str] | None:
+        """Get API keys from existing config entries."""
+        for entry in self.hass.config_entries.async_entries(DOMAIN):
+            api_key = entry.data.get(CONF_API_KEY)
+            if api_key:
+                return {
+                    CONF_API_KEY: api_key,
+                    CONF_API_KEY_SECONDARY: entry.data.get(CONF_API_KEY_SECONDARY),
+                }
+        return None
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
+        # Check if we have existing API keys
+        existing_keys = self._get_existing_api_keys()
+        
+        if existing_keys:
+            # Skip to airport selection if we have valid keys
+            return await self.async_step_airport(user_input, existing_keys)
+        else:
+            # Show API key input step
+            return await self.async_step_api_keys(user_input)
+
+    async def async_step_api_keys(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle API key configuration step."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            # Store API keys and move to airport selection
+            self._existing_api_keys = {
+                CONF_API_KEY: user_input[CONF_API_KEY],
+                CONF_API_KEY_SECONDARY: user_input.get(CONF_API_KEY_SECONDARY),
+            }
+            return await self.async_step_airport()
+
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_API_KEY): cv.string,
+                vol.Optional(CONF_API_KEY_SECONDARY): cv.string,
+            }
+        )
+
+        return self.async_show_form(
+            step_id="api_keys",
+            data_schema=data_schema,
+            errors=errors,
+            description_placeholders={
+                "api_key_desc": "Primär subscription key från Swedavias developer portal (https://apideveloper.swedavia.se). Obligatorisk.",
+                "api_key_secondary_desc": "Sekundär subscription key (valfritt men rekommenderat). Vid nyckelrotation växlar integrationen automatiskt till sekundär nyckel om primär misslyckas.",
+            },
+        )
+
+    async def async_step_airport(
+        self, user_input: dict[str, Any] | None = None,
+        existing_keys: dict[str, str] | None = None
+    ) -> FlowResult:
+        """Handle airport and flight type selection."""
+        errors: dict[str, str] = {}
+
+        # Use provided existing keys or stored keys
+        if existing_keys:
+            self._existing_api_keys = existing_keys
+        
+        if user_input is not None:
+            # Combine API keys with user input
+            complete_data = {
+                **self._existing_api_keys,
+                **user_input,
+            }
+
             try:
-                info = await validate_input(self.hass, user_input)
+                info = await validate_input(self.hass, complete_data)
             except SwedaviaAPIError:
                 errors["base"] = "cannot_connect"
             except Exception:  # pylint: disable=broad-except
@@ -72,7 +143,12 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 self._abort_if_unique_id_configured()
 
-                return self.async_create_entry(title=info["title"], data=user_input)
+                return self.async_create_entry(title=info["title"], data=complete_data)
+
+        # Show message if reusing existing API keys
+        description_placeholders = {}
+        if self._existing_api_keys:
+            description_placeholders["info"] = "✅ Återanvänder API-nycklar från befintlig integration"
 
         # Build schema with airport selector
         # Create airport selection with "Name (IATA)" format
@@ -83,8 +159,6 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         data_schema = vol.Schema(
             {
-                vol.Required(CONF_API_KEY): cv.string,
-                vol.Optional(CONF_API_KEY_SECONDARY): cv.string,
                 vol.Required(CONF_AIRPORT, default="ARN"): vol.In(airport_options),
                 vol.Required(CONF_FLIGHT_TYPE, default=FLIGHT_TYPE_BOTH): vol.In(
                     {
@@ -99,15 +173,10 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
         return self.async_show_form(
-            step_id="user",
+            step_id="airport",
             data_schema=data_schema,
             errors=errors,
-            description_placeholders={
-                "api_key_desc": "Primary subscription key från Swedavias developer portal (https://apideveloper.swedavia.se)",
-                "api_key_secondary_desc": "Secondary key (valfritt men rekommenderat för automatisk failover vid key rotation)",
-                "hours_back_desc": "Antal timmar bakåt i tiden att visa flyg för",
-                "hours_ahead_desc": "Antal timmar framåt i tiden att visa flyg för",
-            },
+            description_placeholders=description_placeholders,
         )
 
     @staticmethod
