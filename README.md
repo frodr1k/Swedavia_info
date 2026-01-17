@@ -288,6 +288,8 @@ content: |
 - Multi-flygplats överblick
 - Med notifieringar
 
+**📱 Automatiska notifieringar:** Se [BAGGAGE_NOTIFICATIONS.md](BAGGAGE_NOTIFICATIONS.md) för 7 olika automationer som skickar push-notiser till din mobil när väskor börjar komma ut!
+
 ### Automation - Notifiering om bagageband
 
 ```yaml

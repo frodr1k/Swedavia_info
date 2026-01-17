@@ -2,6 +2,9 @@
 
 Exempel på olika kort för att visa bagageinformation från Swedavia Flight Information integrationen.
 
+> **📱 Vill du ha push-notiser när väskor börjar komma ut?**  
+> Se [BAGGAGE_NOTIFICATIONS.md](BAGGAGE_NOTIFICATIONS.md) för 7 olika automationer med mobil-notiser!
+
 ## Förutsättningar
 
 Du behöver ha lagt till minst en flygplats med **Ankomster** eller **Både ankomster och avgångar** i integrationen för att se bagagedata.
