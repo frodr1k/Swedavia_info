@@ -279,6 +279,15 @@ content: |
   {% endif %}
 ```
 
+**📚 Fler bagagekort-exempel:** Se [LOVELACE_BAGGAGE_EXAMPLES.md](LOVELACE_BAGGAGE_EXAMPLES.md) för 7 olika varianter av bagagekort, inklusive:
+- Enkel lista med aktiva band
+- Markdown med full information
+- Kompakt vy med ikoner
+- Detaljerad tabell
+- Conditional cards (visas bara vid aktiva band)
+- Multi-flygplats överblick
+- Med notifieringar
+
 ### Automation - Notifiering om bagageband
 
 ```yaml
