@@ -1,5 +1,7 @@
 # Easy Access to Key Rotation Service
 
+Eight different methods to quickly update your Swedavia API keys when they rotate.
+
 ## Quick Access Methods
 
 ### Method 1: Dashboard Button Card ⭐ Recommended
@@ -8,7 +10,7 @@ Add this button to your dashboard for one-click access:
 
 ```yaml
 type: button
-name: Uppdatera API-nycklar
+name: Update API Keys
 icon: mdi:key-plus
 tap_action:
   action: call-service
@@ -35,7 +37,7 @@ Create a script in `configuration.yaml`:
 ```yaml
 script:
   update_swedavia_keys:
-    alias: "Uppdatera Swedavia API-nycklar"
+    alias: "Update Swedavia API Keys"
     icon: mdi:key-chain
     sequence:
       - service: swedavia_flights.update_api_keys
@@ -44,15 +46,15 @@ script:
           api_key_secondary: !secret swedavia_api_key_secondary
       - service: notify.persistent_notification
         data:
-          title: "✅ API-nycklar uppdaterade"
-          message: "Swedavia API-nycklar har uppdaterats för alla integrationer."
+          title: "✅ API Keys Updated"
+          message: "Swedavia API keys have been updated for all integrations."
 ```
 
 Then add a button to dashboard:
 
 ```yaml
 type: button
-name: Uppdatera API-nycklar
+name: Update API Keys
 icon: mdi:key-plus
 tap_action:
   action: call-service
@@ -83,7 +85,7 @@ input_text:
 ```yaml
 script:
   update_swedavia_keys_from_input:
-    alias: "Uppdatera Swedavia-nycklar från input"
+    alias: "Update Swedavia Keys from Input"
     icon: mdi:key-chain
     sequence:
       - service: swedavia_flights.update_api_keys
@@ -92,8 +94,8 @@ script:
           api_key_secondary: "{{ states('input_text.swedavia_secondary_key') }}"
       - service: notify.persistent_notification
         data:
-          title: "✅ API-nycklar uppdaterade"
-          message: "Swedavia API-nycklar har uppdaterats."
+          title: "✅ API Keys Updated"
+          message: "Swedavia API keys have been updated."
 ```
 
 **Step 3:** Create dashboard card:
@@ -102,16 +104,16 @@ script:
 type: vertical-stack
 cards:
   - type: entities
-    title: 🔑 Swedavia API-nycklar
+    title: 🔑 Swedavia API Keys
     entities:
       - entity: input_text.swedavia_primary_key
         name: Primary Key
       - entity: input_text.swedavia_secondary_key
         name: Secondary Key
-      - entity: sensor.stockholm_arlanda_api_nyckel_rotation
+      - entity: sensor.stockholm_arlanda_api_key_rotation
         name: Rotation Status
   - type: button
-    name: Uppdatera Nycklar
+    name: Update Keys
     icon: mdi:key-plus
     tap_action:
       action: call-service
@@ -128,27 +130,27 @@ cards:
   # Status Card
   - type: markdown
     content: |
-      ## 🔑 API-nyckel Management
+      ## 🔑 API Key Management
       
-      **Status:** {{ states('sensor.stockholm_arlanda_api_nyckel_rotation') }}
+      **Status:** {{ states('sensor.stockholm_arlanda_api_key_rotation') }}
       
-      ### Primär Nyckel
-      - Nästa rotation: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_next_rotation')[:10] }}
-      - Dagar kvar: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_days_until') }}
-      {% if state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_warning') %}
+      ### Primary Key
+      - Next rotation: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_next_rotation')[:10] }}
+      - Days remaining: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_days_until') }}
+      {% if state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_warning') %}
       
-      ⚠️ **{{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_warning') }}**
+      ⚠️ **{{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_warning') }}**
       {% endif %}
       
-      ### Sekundär Nyckel
-      - Nästa rotation: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_next_rotation')[:10] }}
-      - Dagar kvar: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_days_until') }}
-      {% if state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_warning') %}
+      ### Secondary Key
+      - Next rotation: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_next_rotation')[:10] }}
+      - Days remaining: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_days_until') }}
+      {% if state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_warning') %}
       
-      ⚠️ **{{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_warning') }}**
+      ⚠️ **{{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_warning') }}**
       {% endif %}
       
-      [Hämta nya nycklar →](https://apideveloper.swedavia.se/)
+      [Get new keys →](https://apideveloper.swedavia.se/)
   
   # Input Fields
   - type: entities
@@ -160,7 +162,7 @@ cards:
   
   # Update Button
   - type: button
-    name: Uppdatera API-nycklar
+    name: Update API Keys
     icon: mdi:key-plus
     tap_action:
       action: call-service
@@ -176,22 +178,22 @@ type: conditional
 conditions:
   - condition: template
     value_template: >
-      {{ 'rotation' in states('sensor.stockholm_arlanda_api_nyckel_rotation').lower() 
-         and 'OK' not in states('sensor.stockholm_arlanda_api_nyckel_rotation') }}
+      {{ 'rotation' in states('sensor.stockholm_arlanda_api_key_rotation').lower() 
+         and 'OK' not in states('sensor.stockholm_arlanda_api_key_rotation') }}
 card:
   type: vertical-stack
   cards:
     - type: markdown
       content: |
-        ## ⚠️ API-nyckel Rotation Påminnelse
+        ## ⚠️ API Key Rotation Reminder
         
-        {{ states('sensor.stockholm_arlanda_api_nyckel_rotation') }}
+        {{ states('sensor.stockholm_arlanda_api_key_rotation') }}
         
-        Det är dags att uppdatera dina API-nycklar!
+        It's time to update your API keys!
         
-        1. Gå till [Swedavia Developer Portal](https://apideveloper.swedavia.se/)
-        2. Hämta nya nycklar under Profile → Subscriptions
-        3. Ange dem nedan och klicka "Uppdatera"
+        1. Go to [Swedavia Developer Portal](https://apideveloper.swedavia.se/)
+        2. Get new keys under Profile → Subscriptions
+        3. Enter them below and click "Update"
     
     - type: entities
       entities:
@@ -199,7 +201,7 @@ card:
         - entity: input_text.swedavia_secondary_key
     
     - type: button
-      name: 🔄 Uppdatera Nycklar Nu
+      name: 🔄 Update Keys Now
       icon: mdi:key-plus
       tap_action:
         action: call-service
@@ -213,7 +215,7 @@ Create a shortcut in your `configuration.yaml`:
 ```yaml
 homeassistant:
   customize:
-    sensor.stockholm_arlanda_api_nyckel_rotation:
+    sensor.stockholm_arlanda_api_key_rotation:
       custom_ui_state_card: state-card-custom-ui
       extra_data_template: >
         [
@@ -236,10 +238,10 @@ Get notified and update with one tap on mobile:
 
 ```yaml
 automation:
-  - alias: "API-nyckel Rotation Notifiering med Action"
+  - alias: "API Key Rotation Notification with Action"
     trigger:
       - platform: state
-        entity_id: sensor.stockholm_arlanda_api_nyckel_rotation
+        entity_id: sensor.stockholm_arlanda_api_key_rotation
     condition:
       - condition: template
         value_template: >
@@ -248,15 +250,15 @@ automation:
     action:
       - service: notify.mobile_app
         data:
-          title: "⚠️ Swedavia API-nyckel Rotation"
-          message: "{{ states('sensor.stockholm_arlanda_api_nyckel_rotation') }}"
+          title: "⚠️ Swedavia API Key Rotation"
+          message: "{{ states('sensor.stockholm_arlanda_api_key_rotation') }}"
           data:
             actions:
               - action: "OPEN_PORTAL"
-                title: "Öppna Developer Portal"
+                title: "Open Developer Portal"
                 uri: "https://apideveloper.swedavia.se/"
               - action: "OPEN_DASHBOARD"
-                title: "Uppdatera Nycklar"
+                title: "Update Keys"
                 uri: "/lovelace/swedavia"  # Your dashboard path
 ```
 
@@ -268,19 +270,19 @@ Create a sentence for voice update:
 conversation:
   intents:
     UpdateSwedaviaKeys:
-      - "uppdatera swedavia nycklar"
-      - "byt api nycklar för swedavia"
-      - "rotera swedavia nycklar"
+      - "update swedavia keys"
+      - "rotate api keys for swedavia"
+      - "change swedavia keys"
 
 intent_script:
   UpdateSwedaviaKeys:
     speech:
-      text: "Uppdaterar Swedavia API-nycklar nu"
+      text: "Updating Swedavia API keys now"
     action:
       - service: script.update_swedavia_keys_from_input
 ```
 
-Then just say: "Hey Google, uppdatera swedavia nycklar"
+Then just say: "Hey Google, update swedavia keys"
 
 ## Complete Setup Example
 
@@ -307,7 +309,7 @@ input_text:
 
 script:
   update_swedavia_keys:
-    alias: "Uppdatera Swedavia API-nycklar"
+    alias: "Update Swedavia API Keys"
     icon: mdi:key-chain
     sequence:
       - service: swedavia_flights.update_api_keys
@@ -316,11 +318,11 @@ script:
           api_key_secondary: !secret swedavia_api_key_secondary
       - service: notify.persistent_notification
         data:
-          title: "✅ API-nycklar uppdaterade"
-          message: "Swedavia API-nycklar har uppdaterats."
+          title: "✅ API Keys Updated"
+          message: "Swedavia API keys have been updated."
 
   update_swedavia_keys_from_input:
-    alias: "Uppdatera från Input"
+    alias: "Update from Input"
     icon: mdi:key-chain
     sequence:
       - service: swedavia_flights.update_api_keys
@@ -339,14 +341,14 @@ script:
           value: ""
       - service: notify.persistent_notification
         data:
-          title: "✅ API-nycklar uppdaterade"
-          message: "Swedavia API-nycklar har uppdaterats och input rensad."
+          title: "✅ API Keys Updated"
+          message: "Swedavia API keys have been updated and input cleared."
 
 automation:
   - alias: "Swedavia Key Rotation Alert"
     trigger:
       - platform: state
-        entity_id: sensor.stockholm_arlanda_api_nyckel_rotation
+        entity_id: sensor.stockholm_arlanda_api_key_rotation
     condition:
       - condition: template
         value_template: >
@@ -355,12 +357,12 @@ automation:
     action:
       - service: notify.mobile_app
         data:
-          title: "⚠️ Swedavia API-nyckel Rotation"
-          message: "{{ states('sensor.stockholm_arlanda_api_nyckel_rotation') }}"
+          title: "⚠️ Swedavia API Key Rotation"
+          message: "{{ states('sensor.stockholm_arlanda_api_key_rotation') }}"
           data:
             actions:
               - action: "OPEN_PORTAL"
-                title: "Hämta nya nycklar"
+                title: "Get New Keys"
                 uri: "https://apideveloper.swedavia.se/"
 ```
 
@@ -371,43 +373,43 @@ cards:
   - type: markdown
     title: 🔑 Swedavia API Management
     content: |
-      **Status:** {{ states('sensor.stockholm_arlanda_api_nyckel_rotation') }}
+      **Status:** {{ states('sensor.stockholm_arlanda_api_key_rotation') }}
       
-      {% if state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_warning') %}
-      ### ⚠️ Varning
-      {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_warning') }}
+      {% if state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_warning') %}
+      ### ⚠️ Warning
+      {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_warning') }}
       {% endif %}
-      {% if state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_warning') %}
-      {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_warning') }}
+      {% if state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_warning') %}
+      {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_warning') }}
       {% endif %}
       
-      [→ Hämta nya nycklar](https://apideveloper.swedavia.se/)
+      [→ Get new keys](https://apideveloper.swedavia.se/)
   
   - type: conditional
     conditions:
       - condition: template
         value_template: >
-          {{ 'rotation' in states('sensor.stockholm_arlanda_api_nyckel_rotation').lower() 
-             and 'OK' not in states('sensor.stockholm_arlanda_api_nyckel_rotation') }}
+          {{ 'rotation' in states('sensor.stockholm_arlanda_api_key_rotation').lower() 
+             and 'OK' not in states('sensor.stockholm_arlanda_api_key_rotation') }}
     card:
       type: entities
-      title: Uppdatera Nycklar
+      title: Update Keys
       entities:
         - entity: input_text.swedavia_primary_key
-          name: Ny Primary Key
+          name: New Primary Key
         - entity: input_text.swedavia_secondary_key
-          name: Ny Secondary Key
+          name: New Secondary Key
   
   - type: horizontal-stack
     cards:
       - type: button
-        name: Uppdatera från Secrets
+        name: Update from Secrets
         icon: mdi:key
         tap_action:
           action: call-service
           service: script.update_swedavia_keys
       - type: button
-        name: Uppdatera från Input
+        name: Update from Input
         icon: mdi:key-plus
         tap_action:
           action: call-service
@@ -422,15 +424,15 @@ cards:
 
 ### Warning Period (1-3 days)
 1. See warning on dashboard
-2. Click "Hämta nya nycklar" link
+2. Click "Get new keys" link
 3. Copy keys from portal
 4. Paste into input fields on dashboard
-5. Click "Uppdatera från Input"
+5. Click "Update from Input"
 6. Done!
 
 ### Rotation Day
 1. Get mobile notification
-2. Tap "Hämta nya nycklar"
+2. Tap "Get New Keys"
 3. Copy keys
 4. Open Home Assistant app
 5. Navigate to Swedavia dashboard
@@ -444,7 +446,7 @@ cards:
 | Update from secrets | `script.update_swedavia_keys` |
 | Update from input | `script.update_swedavia_keys_from_input` |
 | Direct service call | `swedavia_flights.update_api_keys` |
-| Check status | View `sensor.{airport}_api_nyckel_rotation` |
+| Check status | View `sensor.{airport}_api_key_rotation` |
 
 ---
 

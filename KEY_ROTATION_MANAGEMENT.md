@@ -19,12 +19,12 @@ Swedavia rotates API keys every 6 months for security. This integration includes
 
 ### 📊 Key Rotation Sensor
 
-A dedicated sensor (`sensor.{airport}_api_nyckel_rotation`) that monitors key rotation status.
+A dedicated sensor (`sensor.{airport}_api_key_rotation`) that monitors key rotation status.
 
 **Sensor States:**
-- `OK - Nästa rotation om X dagar (primär/sekundär)` - Normal operation
-- `Primär/Sekundär nyckel roteras om X dagar` - Warning period (≤3 days)
-- `Primär/Sekundär nyckel roteras IDAG!` - Rotation day
+- `OK - Next rotation in X days (primary/secondary)` - Normal operation
+- `Primary/Secondary key rotates in X days` - Warning period (≤3 days)
+- `Primary/Secondary key rotates TODAY!` - Rotation day
 
 **Sensor Icon Changes:**
 - 🔑 `mdi:key-chain` - Normal (>3 days)
@@ -94,7 +94,7 @@ data:
 
 **3 days before rotation:**
 
-1. **Check sensor**: `sensor.stockholm_arlanda_api_nyckel_rotation`
+1. **Check sensor**: `sensor.stockholm_arlanda_api_key_rotation`
 2. **See warning** in Home Assistant logs (every 6 hours)
 3. **Get new key** from https://apideveloper.swedavia.se/
 4. **Update via service**:
@@ -120,10 +120,10 @@ Create an automation to notify you:
 
 ```yaml
 automation:
-  - alias: "Notifiera om API-nyckel rotation"
+  - alias: "API Key Rotation Notification"
     trigger:
       - platform: state
-        entity_id: sensor.stockholm_arlanda_api_nyckel_rotation
+        entity_id: sensor.stockholm_arlanda_api_key_rotation
     condition:
       - condition: template
         value_template: >
@@ -132,13 +132,13 @@ automation:
     action:
       - service: notify.mobile_app
         data:
-          title: "⚠️ Swedavia API-nyckel behöver uppdateras"
+          title: "⚠️ Swedavia API Key Needs Update"
           message: >
-            {{ states('sensor.stockholm_arlanda_api_nyckel_rotation') }}
+            {{ states('sensor.stockholm_arlanda_api_key_rotation') }}
             
-            Hämta ny nyckel från: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'developer_portal') }}
+            Get new key from: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'developer_portal') }}
             
-            Uppdatera sedan med service: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'update_service') }}
+            Update with service: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'update_service') }}
 ```
 
 ### Workflow 4: Dashboard Card
@@ -147,9 +147,9 @@ Monitor rotation status on your dashboard:
 
 ```yaml
 type: entities
-title: API-nyckel Status
+title: API Key Status
 entities:
-  - entity: sensor.stockholm_arlanda_api_nyckel_rotation
+  - entity: sensor.stockholm_arlanda_api_key_rotation
     name: Rotation Status
     icon: mdi:key-chain
 ```
@@ -159,21 +159,21 @@ Or detailed card:
 ```yaml
 type: markdown
 content: |
-  ## 🔑 API-nyckel Rotation
+  ## 🔑 API Key Rotation
   
-  **Status:** {{ states('sensor.stockholm_arlanda_api_nyckel_rotation') }}
+  **Status:** {{ states('sensor.stockholm_arlanda_api_key_rotation') }}
   
-  ### Primär Nyckel
-  - Nästa rotation: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_next_rotation')[:10] }}
-  - Dagar kvar: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'primary_key_days_until') }}
+  ### Primary Key
+  - Next rotation: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_next_rotation')[:10] }}
+  - Days remaining: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'primary_key_days_until') }}
   
-  ### Sekundär Nyckel
-  - Nästa rotation: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_next_rotation')[:10] }}
-  - Dagar kvar: {{ state_attr('sensor.stockholm_arlanda_api_nyckel_rotation', 'secondary_key_days_until') }}
+  ### Secondary Key
+  - Next rotation: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_next_rotation')[:10] }}
+  - Days remaining: {{ state_attr('sensor.stockholm_arlanda_api_key_rotation', 'secondary_key_days_until') }}
   
   ---
   
-  [Hämta nya nycklar](https://apideveloper.swedavia.se/)
+  [Get new keys](https://apideveloper.swedavia.se/)
 ```
 
 ## Log Messages
@@ -182,20 +182,20 @@ content: |
 
 **3 days before:**
 ```
-ℹ️ Påminnelse: Din primär API-nyckel kommer att roteras om 3 dagar (2026-04-08). 
-Förbered genom att hämta ny nyckel från https://apideveloper.swedavia.se/
+ℹ️ Reminder: Your primary API key will rotate in 3 days (2026-04-08). 
+Prepare by getting new key from https://apideveloper.swedavia.se/
 ```
 
 **1 day before:**
 ```
-⚠️ VARNING: Din primär API-nyckel roteras IMORGON (2026-04-08)! 
-Uppdatera din nyckel från https://apideveloper.swedavia.se/
+⚠️ WARNING: Your primary API key rotates TOMORROW (2026-04-08)! 
+Update your key from https://apideveloper.swedavia.se/
 ```
 
 **Rotation day:**
 ```
-⚠️ VIKTIGT: Din primär API-nyckel roteras IDAG! 
-Uppdatera din nyckel från https://apideveloper.swedavia.se/ för att undvika avbrott i tjänsten.
+⚠️ IMPORTANT: Your primary API key rotates TODAY! 
+Update your key from https://apideveloper.swedavia.se/ to avoid service interruption.
 ```
 
 ### Service Success Messages
@@ -244,7 +244,7 @@ data:
 ### No warnings appearing
 
 **Check:**
-1. Sensor `sensor.{airport}_api_nyckel_rotation` exists
+1. Sensor `sensor.{airport}_api_key_rotation` exists
 2. Check Home Assistant logs (warnings appear every 6 hours)
 3. Verify current date relative to rotation schedule
 
