@@ -74,8 +74,9 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         existing_keys = self._get_existing_api_keys()
         
         if existing_keys:
-            # Skip to airport selection if we have valid keys
-            return await self.async_step_airport(user_input, existing_keys)
+            # Store existing keys and skip to airport selection
+            self._existing_api_keys = existing_keys
+            return await self.async_step_airport()
         else:
             # Show API key input step
             return await self.async_step_api_keys(user_input)
@@ -112,16 +113,11 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_airport(
-        self, user_input: dict[str, Any] | None = None,
-        existing_keys: dict[str, str] | None = None
+        self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle airport and flight type selection."""
         errors: dict[str, str] = {}
 
-        # Use provided existing keys or stored keys
-        if existing_keys:
-            self._existing_api_keys = existing_keys
-        
         if user_input is not None:
             # Combine API keys with user input
             complete_data = {
@@ -148,6 +144,7 @@ class SwedaviaFlightConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Show message if reusing existing API keys
         description_placeholders = {}
         if self._existing_api_keys:
+            description_placeholders["info"] = "✅ Återanvänder API-nycklar från befintlig integration"
             description_placeholders["info"] = "✅ Återanvänder API-nycklar från befintlig integration"
 
         # Build schema with airport selector
