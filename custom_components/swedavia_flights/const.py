@@ -5,7 +5,7 @@ DOMAIN = "swedavia_flights"
 # API Configuration
 API_BASE_URL = "https://api.swedavia.se/flightinfo/v2"
 API_TIMEOUT = 30
-DEFAULT_SCAN_INTERVAL = 300  # 5 minutes
+DEFAULT_SCAN_INTERVAL = 900  # 15 minutes (optimized for API limit of 10001 calls/30 days)
 
 # Configuration Keys
 CONF_AIRPORT = "airport"
@@ -41,6 +41,7 @@ SENSOR_TYPE_ARRIVALS = "arrivals"
 SENSOR_TYPE_DEPARTURES = "departures"
 SENSOR_TYPE_BAGGAGE = "baggage"
 SENSOR_TYPE_KEY_ROTATION = "key_rotation"
+SENSOR_TYPE_API_COUNTER = "api_counter"
 
 # Flight Status Codes
 FLIGHT_STATUS_SCHEDULED = "SCH"

@@ -42,6 +42,7 @@ from .const import (
     FLIGHT_TYPE_ARRIVALS,
     FLIGHT_TYPE_BOTH,
     FLIGHT_TYPE_DEPARTURES,
+    SENSOR_TYPE_API_COUNTER,
     SENSOR_TYPE_ARRIVALS,
     SENSOR_TYPE_BAGGAGE,
     SENSOR_TYPE_DEPARTURES,
@@ -50,6 +51,7 @@ from .const import (
 )
 from .coordinator import SwedaviaFlightCoordinator
 from .key_rotation import get_all_rotation_info
+from .update_scheduler import UpdateScheduler
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -98,6 +100,14 @@ async def async_setup_entry(
     # Add key rotation sensor (one per integration instance)
     entities.append(
         SwedaviaKeyRotationSensor(
+            entry,
+        )
+    )
+
+    # Add API counter sensor (one per integration instance)
+    entities.append(
+        SwedaviaAPICounterSensor(
+            hass,
             entry,
         )
     )
@@ -444,3 +454,85 @@ class SwedaviaKeyRotationSensor(SensorEntity):
                 return "mdi:key-chain"
         
         return "mdi:key-chain"
+
+
+class SwedaviaAPICounterSensor(SensorEntity):
+    """Sensor for API call counter."""
+
+    _attr_has_entity_name = True
+    _attr_icon = "mdi:counter"
+    _attr_state_class = SensorStateClass.TOTAL
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the API counter sensor."""
+        self._hass = hass
+        self._airport = entry.data[CONF_AIRPORT]
+        self._attr_unique_id = f"{entry.entry_id}_api_counter"
+        self._attr_name = "API Call Counter"
+        self._attr_device_class = None
+
+    @property
+    def native_value(self) -> int:
+        """Return the number of API calls in the last 30 days."""
+        api_counter = self._hass.data.get(DOMAIN, {}).get("api_counter")
+        if api_counter:
+            return api_counter.get_count()
+        return 0
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Return the unit of measurement."""
+        return "calls"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional attributes."""
+        api_counter = self._hass.data.get(DOMAIN, {}).get("api_counter")
+        if not api_counter:
+            return {}
+
+        stats = api_counter.get_stats()
+        
+        # Get schedule information
+        scheduler = UpdateScheduler(self._hass)
+        schedule_info = scheduler.get_schedule_info()
+        
+        return {
+            "total_calls_30_days": stats["total_calls_30_days"],
+            "remaining_calls": stats["remaining_calls"],
+            "percentage_used": stats["percentage_used"],
+            "limit": stats["limit"],
+            "rolling_window_days": stats["rolling_window_days"],
+            "oldest_call": stats["oldest_call"],
+            "last_updated": datetime.now().isoformat(),
+            # Schedule information
+            "total_airports": schedule_info["total_entries"],
+            "update_interval_minutes": schedule_info["update_interval_minutes"],
+            "calls_per_update": schedule_info["total_calls_per_update"],
+            "updates_per_day": schedule_info["updates_per_day"],
+            "estimated_daily_calls": schedule_info["estimated_daily_calls"],
+            "estimated_monthly_calls": schedule_info["estimated_monthly_calls"],
+            "estimated_usage_percentage": schedule_info["percentage_of_limit"],
+        }
+
+    @property
+    def icon(self) -> str:
+        """Return icon based on usage level."""
+        api_counter = self._hass.data.get(DOMAIN, {}).get("api_counter")
+        if not api_counter:
+            return "mdi:counter"
+        
+        percentage = api_counter.get_percentage_used()
+        
+        if percentage >= 100:
+            return "mdi:alert-circle"
+        elif percentage >= 90:
+            return "mdi:alert"
+        elif percentage >= 75:
+            return "mdi:alert-outline"
+        else:
+            return "mdi:counter"

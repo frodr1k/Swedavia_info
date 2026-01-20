@@ -4,12 +4,15 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timedelta, timezone
 import logging
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import aiohttp
 import async_timeout
 
 from .const import API_BASE_URL, API_TIMEOUT
+
+if TYPE_CHECKING:
+    from .api_counter import APICallCounter
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -34,6 +37,7 @@ class SwedaviaFlightAPI:
         session: aiohttp.ClientSession,
         api_key: str | None = None,
         api_key_secondary: str | None = None,
+        api_counter: APICallCounter | None = None,
     ) -> None:
         """Initialize the API client."""
         self._session = session
@@ -42,6 +46,7 @@ class SwedaviaFlightAPI:
         self._current_key = api_key  # Start with primary key
         self._last_request_time = None
         self._min_request_interval = 1  # Minimum 1 second between requests
+        self._api_counter = api_counter
 
     async def _rate_limit(self) -> None:
         """Implement rate limiting."""
@@ -60,6 +65,10 @@ class SwedaviaFlightAPI:
     ) -> dict[str, Any]:
         """Make a request to the Swedavia API."""
         await self._rate_limit()
+
+        # Increment API counter
+        if self._api_counter:
+            await self._api_counter.increment()
 
         url = f"{API_BASE_URL}/{endpoint}"
         headers = {
