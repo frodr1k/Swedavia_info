@@ -21,21 +21,20 @@ update_api_keys:
 
 enable_boost_mode:
   name: Enable Boost Mode
-  description: "⚡ Temporarily increase update frequency to 2 minutes for 4 hours. WARNING: This will significantly increase API usage! Use when you're at the airport and need real-time updates."
+  description: Temporarily enable 2-minute update intervals for real-time flight tracking (1-12 hours). Uses additional API calls.
   fields:
     airport:
-      name: Airport
-      description: Airport IATA code (e.g., ARN, GOT, MMX)
-      required: true
+      name: Airport Code
+      description: Airport code to enable boost mode for (e.g., ARN, BMA, GOT)
       example: "ARN"
+      required: true
       selector:
         text:
     duration:
       name: Duration (hours)
-      description: How many hours to keep boost mode active (1-12 hours, default 4)
-      required: false
+      description: How many hours to keep boost mode active
       default: 4
-      example: 4
+      required: false
       selector:
         number:
           min: 1
@@ -45,12 +44,12 @@ enable_boost_mode:
 
 disable_boost_mode:
   name: Disable Boost Mode
-  description: Manually disable boost mode for an airport before it expires naturally.
+  description: Manually disable boost mode and return to normal update intervals.
   fields:
     airport:
-      name: Airport
-      description: Airport IATA code (e.g., ARN, GOT, MMX)
-      required: true
+      name: Airport Code
+      description: Airport code to disable boost mode for (e.g., ARN, BMA, GOT)
       example: "ARN"
+      required: true
       selector:
         text:
