@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -15,12 +15,15 @@ from .const import (
     CONF_FLIGHT_TYPE,
     CONF_HOURS_AHEAD,
     CONF_HOURS_BACK,
-    DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     FLIGHT_TYPE_ARRIVALS,
     FLIGHT_TYPE_BOTH,
     FLIGHT_TYPE_DEPARTURES,
 )
+from .update_scheduler import calculate_update_schedule
+
+if TYPE_CHECKING:
+    from .boost_mode import BoostMode
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,12 +45,57 @@ class SwedaviaFlightCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.hours_ahead = entry.data.get(CONF_HOURS_AHEAD, 24)
         self.hours_back = entry.data.get(CONF_HOURS_BACK, 2)
 
+        # Calculate optimal update interval and offset using smart scheduler
+        update_interval, update_offset = calculate_update_schedule(hass, entry)
+        
+        _LOGGER.info(
+            "Initializing coordinator for %s with %d minute interval and %d second offset",
+            self.airport,
+            int(update_interval.total_seconds() / 60),
+            int(update_offset.total_seconds()),
+        )
+
         super().__init__(
             hass,
             _LOGGER,
             name=f"{DOMAIN}_{self.airport}",
-            update_interval=timedelta(seconds=DEFAULT_SCAN_INTERVAL),
+            update_interval=update_interval,
         )
+        
+        # Store offset for initial delay
+        self._update_offset = update_offset
+        self._normal_interval = update_interval
+        self._boost_mode: BoostMode | None = None
+
+    def set_boost_mode(self, boost_mode: BoostMode) -> None:
+        """Set the boost mode manager."""
+        self._boost_mode = boost_mode
+
+    async def async_request_refresh(self) -> None:
+        """Request a refresh and check for boost mode."""
+        # Check if boost mode is active and adjust interval
+        if self._boost_mode and self._boost_mode.is_boost_active(self.entry.entry_id):
+            boost_interval = self._boost_mode.get_boost_interval(self.entry.entry_id)
+            if boost_interval:
+                new_interval = timedelta(seconds=boost_interval)
+                if self.update_interval != new_interval:
+                    self.update_interval = new_interval
+                    _LOGGER.info(
+                        "⚡ Boost mode active for %s - interval: %d seconds",
+                        self.airport,
+                        boost_interval,
+                    )
+        else:
+            # Restore normal interval if boost ended
+            if self.update_interval != self._normal_interval:
+                self.update_interval = self._normal_interval
+                _LOGGER.info(
+                    "Normal mode restored for %s - interval: %d minutes",
+                    self.airport,
+                    int(self._normal_interval.total_seconds() / 60),
+                )
+
+        await super().async_request_refresh()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from API."""

@@ -64,3 +64,9 @@ secrets.yaml
 *.pdf
 *.docx
 *.xlsx
+
+# Local reference files (not needed in repo)
+flightinfov2.json
+SLUTRAPPORT.md
+*_SUMMARY.md
+*_DOCUMENTATION.md

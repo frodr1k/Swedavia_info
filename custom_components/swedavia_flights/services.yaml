@@ -18,3 +18,39 @@ update_api_keys:
       required: false
       selector:
         text:
+
+enable_boost_mode:
+  name: Enable Boost Mode
+  description: "⚡ Temporarily increase update frequency to 2 minutes for 4 hours. WARNING: This will significantly increase API usage! Use when you're at the airport and need real-time updates."
+  fields:
+    airport:
+      name: Airport
+      description: Airport IATA code (e.g., ARN, GOT, MMX)
+      required: true
+      example: "ARN"
+      selector:
+        text:
+    duration:
+      name: Duration (hours)
+      description: How many hours to keep boost mode active (1-12 hours, default 4)
+      required: false
+      default: 4
+      example: 4
+      selector:
+        number:
+          min: 1
+          max: 12
+          step: 1
+          unit_of_measurement: "hours"
+
+disable_boost_mode:
+  name: Disable Boost Mode
+  description: Manually disable boost mode for an airport before it expires naturally.
+  fields:
+    airport:
+      name: Airport
+      description: Airport IATA code (e.g., ARN, GOT, MMX)
+      required: true
+      example: "ARN"
+      selector:
+        text:
